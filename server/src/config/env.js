@@ -47,6 +47,9 @@ const schema = z.object({
 
   STORAGE_DRIVER: z.enum(['local', 'gcs', 'r2']).default('local'),
   STORAGE_LOCAL_PATH: z.string().default('./storage'),
+  // Path to the built SPA served by the API in single-container deployments.
+  // Unset by default so local development keeps using the Vite dev server.
+  CLIENT_DIST_PATH: z.string().optional(),
   FIREBASE_STORAGE_BUCKET: z.string().optional(),
   GOOGLE_APPLICATION_CREDENTIALS: z.string().optional(),
   R2_ACCOUNT_ID: z.string().optional(),

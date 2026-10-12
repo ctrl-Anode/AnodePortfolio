@@ -1,0 +1,12 @@
+# Keep text files consistently normalized.
+* text=auto
+
+# Shell scripts must never get CRLF - they would break inside Linux containers.
+*.sh text eol=lf
+
+# Deploy-critical files: keep LF regardless of checkout platform.
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+render.yaml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

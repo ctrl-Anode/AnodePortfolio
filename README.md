@@ -104,6 +104,7 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 │   │   ├── schema.prisma       # Data model
 │   │   ├── migrations/         # Versioned SQL migrations
 │   │   └── seed.js             # Permissions, roles, admin user, profile, hero
+│   ├── docker-entrypoint.sh    # Container boot: migrate deploy (+ optional seed)
 │   ├── src/
 │   │   ├── config/             # env parsing, logger
 │   │   ├── middleware/         # auth, authorize, validate, rate limit, errors
@@ -115,6 +116,8 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 │   └── package.json
 ├── e2e/                        # Playwright specs (auth, portfolio)
 ├── monitoring/                 # Prometheus + Grafana provisioning
+├── Dockerfile                  # Single-container build: SPA + API + inline workers
+├── render.yaml                 # Render Blueprint (single web service)
 ├── docker-compose.yml          # mysql, redis, meili, mailpit, prometheus, grafana,
 │                               # redis-exporter, migrate, api, worker, web
 ├── SETUP.md                    # Detailed environment + setup walkthrough
@@ -391,6 +394,31 @@ npm run e2e:ui
 5. Configure `SENTRY_DSN`, `PROD_CSP`, and rate limits; point `CORS_ORIGIN` at the real site origin
 6. For media on object storage set `STORAGE_DRIVER=gcs` and the Firebase/GCS credentials; otherwise `local` serves `/uploads` directly
 7. Monitoring stack (Prometheus, Grafana, redis-exporter) is included in `docker-compose.yml` and provisioned via `monitoring/`
+
+### 12.1 Render - single container (client + server)
+
+The root `Dockerfile` builds the Vue SPA and has the Express API serve it from the same
+origin, so the whole app runs as **one** container. `render.yaml` is the matching Blueprint.
+
+```bash
+docker build -t anod-portfolio .
+docker run --env-file server/.env -p 5000:5000 anod-portfolio
+```
+
+Requirements & notes for Render:
+
+- Render does **not** run `docker-compose.yml`; use the root `Dockerfile` / `render.yaml` instead.
+- Render has **no managed MySQL** - point `DATABASE_URL` at an external MySQL instance
+  (Aiven, Railway, Cloud SQL, RDS...). Redis can be a Render Key Value instance.
+- `PORT` is injected by Render; the API binds `0.0.0.0:$PORT` already.
+- `WORKER_MODE=inline` runs the BullMQ workers inside the same process - no separate worker.
+- Set `MEILI_ENABLED=false` (no Meilisearch on Render) - falls back to SQL LIKE search.
+- Render's filesystem is ephemeral - keep `STORAGE_DRIVER=r2` (or attach a paid disk) so
+  uploads survive restarts.
+- The image entrypoint (`server/docker-entrypoint.sh`) applies `prisma migrate deploy` on
+  boot and runs `prisma db seed` only when `RUN_SEED=true` (idempotent). Turn `RUN_SEED`
+  off once your content is in place.
+- Client env is baked at build time - leave `VITE_API_BASE_URL` empty (same-origin `/api/v1`).
 
 ---
 

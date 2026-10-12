@@ -1,0 +1,22 @@
+# Root build context for the combined single-image deployment.
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+**/*.log
+
+# Local runtime data
+server/storage
+client/deploy/certs/*.pem
+
+# Repo/tooling metadata
+.git
+.github
+.vscode
+.idea
+e2e
+monitoring
+playwright-report
+test-results
+blob-report

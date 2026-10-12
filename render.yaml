@@ -1,0 +1,68 @@
+# Render Blueprint - one Docker web service that serves both the SPA and the API.
+#
+# Notes:
+#   * Render injects PORT automatically; do not set it here.
+#   * DATABASE_URL must point at an EXTERNAL MySQL instance (Render has no managed
+#     MySQL). Redis can be a Render Key Value instance (internal URL).
+#   * Values marked `sync: false` are secrets/URLs you fill in the Render dashboard
+#     (or via `render.yaml` env sync) after the first deploy.
+services:
+  - type: web
+    name: anod-portfolio
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_DIST_PATH
+        value: /app/client-dist
+      - key: WORKER_MODE
+        value: inline
+      - key: MEILI_ENABLED
+        value: "false"
+      - key: STORAGE_DRIVER
+        value: r2
+      # Seeding is idempotent; set to "false" once your data is in place.
+      - key: RUN_SEED
+        value: "true"
+
+      # --- Filled in from the dashboard ---------------------------------------
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: MFA_TOKEN_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: API_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: MAIL_DRIVER
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_PUBLIC_URL
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
