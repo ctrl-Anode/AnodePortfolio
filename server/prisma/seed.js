@@ -85,15 +85,35 @@ async function seedRoles() {
 async function seedAdmin() {
   const email = process.env.ADMIN_EMAIL || 'admin@example.com';
   const password = process.env.ADMIN_PASSWORD || 'Admin123!';
+
+  // Reconcile (not just create): a naive "skip if exists" seed leaves a deployed
+  // admin stuck with whatever credentials were set the FIRST time it ran, so
+  // changing ADMIN_EMAIL/ADMIN_PASSWORD in the dashboard and redeploying had no
+  // effect and login kept returning 401. Every seed run now syncs the admin user
+  // (password, active status, admin role) with the current env.
   const passwordHash = await argon2.hash(password);
+  const adminRole = await prisma.role.findUniqueOrThrow({ where: { name: 'admin' } });
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    console.log(`Admin ${email} already exists, skipping.`);
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        passwordHash,
+        status: 'ACTIVE',
+        deletedAt: null,
+        emailVerifiedAt: existing.emailVerifiedAt ?? new Date()
+      }
+    });
+    const alreadyAdmin = await prisma.userRole.findFirst({
+      where: { userId: existing.id, roleId: adminRole.id }
+    });
+    if (!alreadyAdmin) {
+      await prisma.userRole.create({ data: { userId: existing.id, roleId: adminRole.id } });
+    }
+    console.log(`Admin ${email} synced (email/password from ADMIN_EMAIL/ADMIN_PASSWORD or defaults).`);
     return;
   }
-
-  const adminRole = await prisma.role.findUniqueOrThrow({ where: { name: 'admin' } });
 
   await prisma.user.create({
     data: {
@@ -106,7 +126,7 @@ async function seedAdmin() {
       roles: { create: [{ roleId: adminRole.id }] }
     }
   });
-  console.log(`Created admin user ${email} with password from ADMIN_PASSWORD.`);
+  console.log(`Created admin user ${email} (email/password from ADMIN_EMAIL/ADMIN_PASSWORD or defaults).`);
 }
 
 async function seedPortfolio() {
