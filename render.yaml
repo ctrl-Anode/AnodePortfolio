@@ -21,6 +21,10 @@ services:
         value: /app/client-dist
       - key: WORKER_MODE
         value: inline
+      # Strict Helmet CSP (tuned in server/src/middleware/base.js). Swagger
+      # (/api/docs) gets its own per-request nonce so docs stay functional.
+      - key: PROD_CSP
+        value: "true"
       - key: MEILI_ENABLED
         value: "false"
       - key: STORAGE_DRIVER
