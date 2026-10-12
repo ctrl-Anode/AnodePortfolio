@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 const THEME_KEY = 'theme';
 
 function preferredTheme() {
-  if (typeof window === 'undefined') return 'light';
-  return localStorage.getItem(THEME_KEY) || 'light';
+  if (typeof window === 'undefined') return 'dark';
+  return localStorage.getItem(THEME_KEY) || 'dark';
 }
 
 export const useUiStore = defineStore('ui', {
