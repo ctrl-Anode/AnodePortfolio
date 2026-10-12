@@ -19,9 +19,9 @@ logs/
 *.log
 npm-debug.log*
 
-# Storage (local uploads)
-storage/
-!storage/.gitkeep
+# Storage (local uploads) - scoped to the uploads dir, never source code
+server/storage/
+!server/storage/.gitkeep
 
 # Prisma
 server/prisma/*.db
