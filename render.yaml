@@ -25,6 +25,10 @@ services:
         value: "false"
       - key: STORAGE_DRIVER
         value: r2
+      # MAIL_DRIVER takes exactly ONE value: log | smtp | resend | sendgrid | mailgun | ses.
+      # "log" is the safe default (prints to logs). Switch to a real driver + keys for email.
+      - key: MAIL_DRIVER
+        value: log
       # Seeding is idempotent; set to "false" once your data is in place.
       - key: RUN_SEED
         value: "true"
@@ -47,8 +51,6 @@ services:
       - key: CLIENT_URL
         sync: false
       - key: CORS_ORIGIN
-        sync: false
-      - key: MAIL_DRIVER
         sync: false
       - key: MAIL_FROM
         sync: false
