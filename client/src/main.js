@@ -7,6 +7,13 @@ import { animateDirective } from './directives/animate';
 import { permissionDirective } from './directives/permission';
 import { revealDirective } from './directives/reveal';
 
+// Apply the saved theme before mounting so dark-mode users don't get a light flash.
+// This used to be an inline <script> in index.html; it lives here so the page is
+// compatible with a strict Content-Security-Policy (inline scripts are blocked).
+if (localStorage.getItem('theme') === 'dark') {
+  document.documentElement.classList.add('dark');
+}
+
 const app = createApp(App);
 const pinia = createPinia();
 
