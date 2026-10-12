@@ -2,11 +2,19 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const booleanish = z
-  .enum(['true', 'false'])
+  .preprocess((value) => (typeof value === 'string' ? value.trim().toLowerCase() : value), z.enum(['true', 'false']))
   .transform((value) => value === 'true');
 
+// Enum values are normalized (trim + lowercase) and blank strings fall back to
+// the default, so stray whitespace/casing or an empty env var cannot crash boot.
+const enumish = (values, fallback) =>
+  z.preprocess(
+    (value) => (typeof value === 'string' ? value.trim().toLowerCase() : value),
+    z.enum(values).optional().default(fallback)
+  );
+
 const schema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  NODE_ENV: enumish(['development', 'test', 'production'], 'development'),
   PORT: z.coerce.number().int().positive().default(5000),
 
   APP_URL: z.string().url().default('http://localhost:5173'),
@@ -27,9 +35,9 @@ const schema = z.object({
   MEILI_HOST: z.string().default('http://localhost:7700'),
   MEILI_API_KEY: z.string().optional(),
 
-  WORKER_MODE: z.enum(['inline', 'standalone', 'off']).default('inline'),
+  WORKER_MODE: enumish(['inline', 'standalone', 'off'], 'inline'),
 
-  MAIL_DRIVER: z.enum(['log', 'smtp', 'resend', 'sendgrid', 'mailgun', 'ses']).default('log'),
+  MAIL_DRIVER: enumish(['log', 'smtp', 'resend', 'sendgrid', 'mailgun', 'ses'], 'log'),
   MAIL_FROM: z.string().default('Acme <no-reply@example.com>'),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().default(1025),
@@ -45,7 +53,7 @@ const schema = z.object({
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
 
-  STORAGE_DRIVER: z.enum(['local', 'gcs', 'r2']).default('local'),
+  STORAGE_DRIVER: enumish(['local', 'gcs', 'r2'], 'local'),
   STORAGE_LOCAL_PATH: z.string().default('./storage'),
   // Path to the built SPA served by the API in single-container deployments.
   // Unset by default so local development keeps using the Vite dev server.
@@ -84,7 +92,10 @@ const parsed = schema.safeParse(process.env);
 if (!parsed.success) {
   console.error('Invalid environment configuration:');
   for (const issue of parsed.error.issues) {
-    console.error(`  ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+    const key = issue.path.join('.') || '(root)';
+    const received = process.env[key] !== undefined ? JSON.stringify(process.env[key]) : 'unset';
+    console.error(`  ${key}: ${issue.message}`);
+    console.error(`    received: ${received}`);
   }
   console.error('Compare your .env with the provided .env.example.');
   process.exit(1);
