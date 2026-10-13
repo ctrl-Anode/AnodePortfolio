@@ -24,18 +24,32 @@ const uploading = reactive({});
 
 const UPLOADERS = {
   document: uploadsApi.uploadDocument,
+  certificate: uploadsApi.uploadCertificate,
   video: uploadsApi.uploadVideo,
   image: uploadsApi.uploadImage
 };
 
 const ACCEPT = {
   document: '.pdf,.doc,.docx',
+  certificate: '.pdf,.jpg,.jpeg,.png,.webp',
   video: 'video/mp4,video/webm,video/quicktime',
   image: 'image/jpeg,image/png,image/webp,image/gif'
 };
 
 function acceptFor(kind) {
   return ACCEPT[kind] || ACCEPT.image;
+}
+
+function isImageValue(value) {
+  return typeof value === 'string' && /\.(?:png|jpe?g|webp|gif|avif|svg)(?:\?.*)?$/i.test(value);
+}
+
+// Certificates may be a PDF or a scanned image, so only preview when the value
+// actually looks like an image.
+function showImage(field) {
+  if (field.uploadKind === 'image') return true;
+  if (field.uploadKind === 'certificate') return isImageValue(form[field.name]);
+  return false;
 }
 
 async function handleUpload(field, event) {
@@ -187,7 +201,7 @@ const inputClass = 'mt-1 block w-full rounded-lg border-0 px-3 py-2 text-sm shad
             <span v-if="uploading[field.name]" class="mt-1 block text-xs text-gray-400">Uploading… {{ uploadProgress[field.name] }}%</span>
             <template v-else-if="form[field.name]">
               <img
-                v-if="field.uploadKind !== 'document' && field.uploadKind !== 'video'"
+                v-if="showImage(field)"
                 :src="form[field.name]"
                 alt=""
                 class="mt-2 h-12 w-12 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700"

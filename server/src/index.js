@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { config } from './config/env.js';
 import { logger } from './config/logger.js';
+import { verifyStorageConfig } from './services/storage/index.js';
 import { createApp } from './app.js';
 
 if (config.SENTRY_DSN) {
@@ -13,6 +14,7 @@ if (config.SENTRY_DSN) {
 }
 
 const app = createApp();
+verifyStorageConfig(logger);
 const server = app.listen(config.PORT, () => {
   logger.info(`API listening on http://localhost:${config.PORT} (${config.NODE_ENV})`);
   logger.info(`Swagger docs at http://localhost:${config.PORT}/api/docs`);

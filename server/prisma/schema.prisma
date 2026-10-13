@@ -294,7 +294,7 @@ model Certificate {
   title         String   @db.VarChar(200)
   issuer        String   @db.VarChar(150)
   issuedAt      DateTime
-  credentialUrl String?  @db.VarChar(500)
+  credentialUrl String?  @db.Text
   imageUrl      String?  @db.Text
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())

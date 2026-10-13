@@ -224,7 +224,7 @@ MySQL 8 via Prisma. Migrations live in `server/prisma/migrations`.
 | `Experience` | Work history | `role`, `company`, `location`, `startDate`, `endDate`, `current`, `description`, `sortOrder` |
 | `Project` | Portfolio projects | `title`, `slug`, `description`, `techStack`, `repoUrl`, `demoUrl`, `imageUrl`, `featured`, `published` |
 | `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `icon`, `logoUrl` |
-| `Certificate` | Credentials | `title`, `issuer`, `issuedAt`, `credentialUrl`, `imageUrl` |
+| `Certificate` | Credentials | `title`, `issuer`, `issuedAt`, `credentialUrl` (uploaded PDF/image), `imageUrl` |
 | `GithubRepo` | Synced repositories | `name`, `url`, `language`, `stars`, `topics` |
 | `Testimonial` | Quotes | `author`, `role`, `quote`, `avatarUrl` |
 | `ContactMessage` | Contact inbox | `name`, `email`, `subject`, `message`, `status` |
@@ -393,7 +393,7 @@ npm run e2e:ui
 3. Start the API and a worker process (`npm run start`, `npm run worker`) or use the Docker `api` / `worker` services
 4. Set strong unique secrets for the three JWT/MFA keys; set `NODE_ENV=production`
 5. Configure `SENTRY_DSN`, `PROD_CSP`, and rate limits; point `CORS_ORIGIN` at the real site origin
-6. For media on object storage set `STORAGE_DRIVER=gcs` and the Firebase/GCS credentials; otherwise `local` serves `/uploads` directly
+6. For media on object storage set `STORAGE_DRIVER=r2` (Cloudflare R2) or `gcs` and provide the matching credentials. On ephemeral hosts (Render, Fly, Heroku) never use `local`: the container filesystem is wiped on redeploy, so uploaded images/files vanish and their stored URLs 404
 7. Monitoring stack (Prometheus, Grafana, redis-exporter) is included in `docker-compose.yml` and provisioned via `monitoring/`
 
 ### 12.1 Render - single container (client + server)
@@ -459,6 +459,7 @@ Render's 750 free hours.
 | 422 on hero save | Button target must be a URL, path, `#anchor`, or plain section key - the admin dropdown already enforces valid keys |
 | Client can't reach the API | Check `VITE_API_BASE_URL` / `VITE_PROXY_TARGET`; the default proxy targets `http://localhost:5000` |
 | Render URL shows "Application loading" for 30-60s then works | Free instance spun down after 15 min idle (cold start). Keep it warm with an external `/healthz` monitor or upgrade the instance type - see [12.2](#122-render-free-tier-cold-starts) |
+| Images/files 404 or show as broken after a Render redeploy | Render's filesystem is **ephemeral**, so uploads are lost whenever the container is replaced. Cause is usually `STORAGE_DRIVER` falling back to `local` (unset) or a missing/wrong `R2_*` env var. Set `STORAGE_DRIVER=r2` plus all five `R2_*` vars and make the bucket publicly readable (r2.dev or a custom domain); the server logs the active driver and warns at boot - see [12.1 Render](#121-render---single-container-client--server). Re-upload media saved while `local` was active, since those files are gone |
 
 Further setup details: **[SETUP.md](SETUP.md)**.
 

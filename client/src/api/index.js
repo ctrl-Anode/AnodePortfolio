@@ -40,6 +40,17 @@ export const uploadsApi = {
       })
       .then((r) => r.data.data);
   },
+  uploadCertificate: (file, onProgress) => {
+    const form = new FormData();
+    form.append('file', file);
+    return http
+      .post('/uploads/certificate', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (event) =>
+          onProgress?.(Math.round((event.loaded * 100) / (event.total || file.size)))
+      })
+      .then((r) => r.data.data);
+  },
   uploadImage: (file, onProgress) => {
     const form = new FormData();
     form.append('file', file);

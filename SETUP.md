@@ -352,9 +352,11 @@ All drivers share:
 
 Files are written to `STORAGE_LOCAL_PATH` (default `./storage`) and served back at `/uploads/<key>` by Express static. Nothing else to configure.
 
+> ⚠️ **Not for production on ephemeral hosts** (Render, Fly, Heroku). The container filesystem is replaced on every deploy/restart, so uploaded files and images **vanish** and their stored URLs 404. Use `r2` (or a persistent disk) there - the server logs a boot warning when `STORAGE_DRIVER=local` runs in production.
+
 #### `STORAGE_DRIVER=r2` (Cloudflare R2, S3-compatible)
 
-R2 hosts avatars and résumés/documents via the S3 API. Uploads go through the API using an S3 access key pair; public reads use either the bucket's `r2.dev` development URL or a custom domain.
+R2 hosts avatars, résumés/documents, project media, certificate files and skill logos via the S3 API. Uploads go through the API using an S3 access key pair; public reads use either the bucket's `r2.dev` development URL or a custom domain.
 
 1. Cloudflare dashboard → **R2** → *Create bucket* (e.g. `anod-portfolio`) → copy the **Account ID** from the R2 overview
 2. **R2 → API → Manage API tokens** → *Create API token* → permission **Object Read & Write** → scope it to the bucket → copy the **Access Key ID** and **Secret Access Key**
@@ -370,7 +372,7 @@ R2_BUCKET=anod-portfolio
 R2_PUBLIC_URL=https://pub-xxxxxxxx.r2.dev   # or https://cdn.yourdomain.com
 ```
 
-All five variables are required when `STORAGE_DRIVER=r2`; uploads return `503 SERVICE_DISABLED` with the missing names otherwise. Uploaded keys are prefixed `avatars/` and `documents/` and addressed as `${R2_PUBLIC_URL}/<key>`.
+All five variables are required when `STORAGE_DRIVER=r2`; uploads return `503 SERVICE_DISABLED` with the missing names otherwise. Uploaded keys are prefixed `avatars/`, `images/`, `videos/`, `documents/` and `certificates/` and addressed as `${R2_PUBLIC_URL}/<key>`.
 
 #### `STORAGE_DRIVER=gcs` (Firebase Storage or plain Google Cloud Storage)
 

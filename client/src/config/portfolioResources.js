@@ -121,6 +121,7 @@ export const RESOURCES = [
     labelPlural: 'Certificates',
     description: 'Credentials and certifications',
     columns: [
+      { accessorKey: 'imageUrl', header: 'Image', render: 'image' },
       { accessorKey: 'title', header: 'Title' },
       { accessorKey: 'issuer', header: 'Issuer' },
       { accessorKey: 'issuedAt', header: 'Issued', render: 'date' }
@@ -129,8 +130,8 @@ export const RESOURCES = [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'issuer', label: 'Issuer', type: 'text', required: true },
       { name: 'issuedAt', label: 'Issue date', type: 'date', required: true },
-      { name: 'credentialUrl', label: 'Credential URL', type: 'url' },
-      { name: 'imageUrl', label: 'Image URL', type: 'url' },
+      { name: 'credentialUrl', label: 'Credential file', type: 'upload', uploadKind: 'certificate', hint: 'PDF or image up to 20MB - stored in Cloudflare R2' },
+      { name: 'imageUrl', label: 'Certificate image', type: 'upload', uploadKind: 'image', hint: 'Optional preview image - stored in Cloudflare R2' },
       { name: 'sortOrder', label: 'Sort order', type: 'number', hint: 'Lower shows first' }
     ]
   },

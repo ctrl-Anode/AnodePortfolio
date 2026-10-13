@@ -128,7 +128,7 @@ export const createSchemas = {
     title: z.string().trim().min(1).max(200),
     issuer: z.string().trim().min(1).max(150),
     issuedAt: z.coerce.date(),
-    credentialUrl: optUrl,
+    credentialUrl: optString(5000),
     imageUrl: optString(5000),
     sortOrder: intField
   }),

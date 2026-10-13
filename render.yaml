@@ -27,6 +27,9 @@ services:
         value: "true"
       - key: MEILI_ENABLED
         value: "false"
+      # Cloudflare R2 for uploads. Render's container filesystem is EPHEMERAL,
+      # so keep this as r2 and fill in every R2_* var below - otherwise each
+      # redeploy wipes uploaded images/files and their stored URLs 404.
       - key: STORAGE_DRIVER
         value: r2
       # MAIL_DRIVER takes exactly ONE value: log | smtp | resend | sendgrid | mailgun | ses.

@@ -36,6 +36,17 @@ const documentUpload = multer({
   }
 });
 
+const certificateUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: UPLOADS.MAX_CERTIFICATE_BYTES, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (!UPLOADS.CERTIFICATE_MIMES.includes(file.mimetype)) {
+      return cb(ApiError.badRequest(`Allowed certificate types: ${UPLOADS.CERTIFICATE_MIMES.join(', ')}`));
+    }
+    cb(null, true);
+  }
+});
+
 const videoUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: UPLOADS.MAX_VIDEO_BYTES, files: 1 },
@@ -209,6 +220,55 @@ router.post(
     const file = requireFile(req);
 
     const key = buildFileKey('documents', file.originalname);
+    await putObject(key, file.buffer, file.mimetype);
+
+    const created = await prisma.file.create({
+      data: {
+        uploaderId: req.user.id,
+        key,
+        originalName: file.originalname?.slice(0, 250),
+        mimeType: file.mimetype,
+        size: file.size
+      }
+    });
+
+    logAudit({ userId: req.user.id, action: 'upload.created', entity: 'file', entityId: created.id, ip: req.ip });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        ...created,
+        url: objectUrl(created.key)
+      }
+    });
+  })
+);
+
+/* @openapi
+  /uploads/certificate:
+    post:
+      tags: [Uploads]
+      summary: Upload a certificate credential (PDF or image; multipart/form-data, field "file")
+      description: Stores a PDF/JPG/PNG/WEBP up to 20MB and returns its public URL. No image processing is queued.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        201: { description: File stored }
+*/
+router.post(
+  '/certificate',
+  certificateUpload.single('file'),
+  asyncHandler(async (req, res) => {
+    const file = requireFile(req);
+
+    const key = buildFileKey('certificates', file.originalname);
     await putObject(key, file.buffer, file.mimetype);
 
     const created = await prisma.file.create({

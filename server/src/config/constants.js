@@ -38,12 +38,15 @@ export const UPLOADS = {
   MAX_FILE_BYTES: 25 * 1024 * 1024,
   MAX_DOCUMENT_BYTES: 10 * 1024 * 1024,
   MAX_VIDEO_BYTES: 25 * 1024 * 1024,
+  MAX_CERTIFICATE_BYTES: 20 * 1024 * 1024,
   IMAGE_MIMES: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   DOCUMENT_MIMES: [
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   ],
+  // A certificate credential can be a PDF or a scanned photo, so accept both.
+  CERTIFICATE_MIMES: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
   VIDEO_MIMES: ['video/mp4', 'video/webm', 'video/quicktime'],
   IMAGE_VARIANTS: [
     { name: 'thumb', width: 160 },
