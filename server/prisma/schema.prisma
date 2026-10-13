@@ -268,8 +268,6 @@ model Skill {
   icon      String?  @db.VarChar(80)
   /// Custom or uploaded logo image; takes precedence over `icon`
   logoUrl   String?  @db.Text
-  keywords  Json?
-  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

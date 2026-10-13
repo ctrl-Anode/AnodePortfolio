@@ -223,7 +223,7 @@ MySQL 8 via Prisma. Migrations live in `server/prisma/migrations`.
 | `Hero` | Landing content | `heroBio`, `primaryButtonText/Url`, `secondaryButtonText/Url`, `published`, `sortOrder` |
 | `Experience` | Work history | `role`, `company`, `location`, `startDate`, `endDate`, `current`, `description`, `sortOrder` |
 | `Project` | Portfolio projects | `title`, `slug`, `description`, `techStack`, `repoUrl`, `demoUrl`, `imageUrl`, `featured`, `published` |
-| `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `icon`, `logoUrl`, `keywords`, `sortOrder` |
+| `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `icon`, `logoUrl` |
 | `Certificate` | Credentials | `title`, `issuer`, `issuedAt`, `credentialUrl`, `imageUrl` |
 | `GithubRepo` | Synced repositories | `name`, `url`, `language`, `stars`, `topics` |
 | `Testimonial` | Quotes | `author`, `role`, `quote`, `avatarUrl` |

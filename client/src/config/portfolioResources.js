@@ -100,22 +100,19 @@ export const RESOURCES = [
     resource: 'skill',
     label: 'Skill',
     labelPlural: 'Skills',
-    description: 'Hard skills (with logos) and soft skills, grouped by category',
+    description: 'Hard skills (with logos) and soft skills, grouped by category and sorted A-Z',
     columns: [
       { accessorKey: 'logoUrl', header: 'Logo', render: 'image' },
       { accessorKey: 'name', header: 'Name' },
       { accessorKey: 'type', header: 'Type', render: 'badge', badgeTone: { hard: 'green', soft: 'amber' } },
-      { accessorKey: 'category', header: 'Category', render: 'badge' },
-      { accessorKey: 'sortOrder', header: 'Order' }
+      { accessorKey: 'category', header: 'Category', render: 'badge' }
     ],
     fields: [
       { name: 'name', label: 'Name', type: 'text', required: true },
       { name: 'type', label: 'Type', type: 'select', options: ['hard', 'soft'], hint: 'Hard skills show a logo; soft skills render as chips' },
       { name: 'category', label: 'Category', type: 'text', hint: 'e.g. Languages, AI tools, Frameworks. Defaults to "Other"' },
       { name: 'icon', label: 'Logo icon', type: 'text', hint: 'Simple Icons slug, e.g. python, openai, docker (logo at cdn.simpleicons.org)' },
-      { name: 'logoUrl', label: 'Custom logo', type: 'upload', uploadKind: 'image', hint: 'Optional image - overrides the icon slug above' },
-      { name: 'keywords', label: 'Keywords', type: 'list', hint: 'One keyword per line' },
-      { name: 'sortOrder', label: 'Sort order', type: 'number', hint: 'Lower shows first' }
+      { name: 'logoUrl', label: 'Custom logo', type: 'upload', uploadKind: 'image', hint: 'Optional image - overrides the icon slug above' }
     ]
   },
   {

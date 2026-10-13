@@ -122,9 +122,7 @@ export const createSchemas = {
     type: skillType,
     category: optString(50),
     icon: optString(80),
-    logoUrl: optString(5000),
-    keywords: jsonField,
-    sortOrder: intField
+    logoUrl: optString(5000)
   }),
   certificate: z.object({
     title: z.string().trim().min(1).max(200),

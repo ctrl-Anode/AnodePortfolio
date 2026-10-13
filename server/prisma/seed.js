@@ -172,20 +172,20 @@ async function seedPortfolio() {
   if (skillCount === 0) {
     await prisma.skill.createMany({
       data: [
-        { name: 'JavaScript', type: 'hard', category: 'Languages', icon: 'javascript', sortOrder: 0 },
-        { name: 'TypeScript', type: 'hard', category: 'Languages', icon: 'typescript', sortOrder: 1 },
-        { name: 'Python', type: 'hard', category: 'Languages', icon: 'python', sortOrder: 2 },
-        { name: 'Vue.js', type: 'hard', category: 'Frameworks', icon: 'vuedotjs', sortOrder: 3 },
-        { name: 'Node.js', type: 'hard', category: 'Frameworks', icon: 'nodedotjs', sortOrder: 4 },
-        { name: 'PostgreSQL', type: 'hard', category: 'Databases', icon: 'postgresql', sortOrder: 5 },
-        { name: 'Docker', type: 'hard', category: 'DevOps', icon: 'docker', sortOrder: 6 },
-        { name: 'OpenAI API', type: 'hard', category: 'AI tools', icon: 'openai', sortOrder: 7 },
-        { name: 'Figma', type: 'hard', category: 'AI tools', icon: 'figma', sortOrder: 8 },
-        { name: 'Communication', type: 'soft', category: 'Interpersonal', sortOrder: 9 },
-        { name: 'Teamwork', type: 'soft', category: 'Interpersonal', sortOrder: 10 },
-        { name: 'Problem solving', type: 'soft', category: 'Interpersonal', sortOrder: 11 },
-        { name: 'Adaptability', type: 'soft', category: 'Personal', sortOrder: 12 },
-        { name: 'Time management', type: 'soft', category: 'Personal', sortOrder: 13 }
+        { name: 'JavaScript', type: 'hard', category: 'Languages', icon: 'javascript' },
+        { name: 'TypeScript', type: 'hard', category: 'Languages', icon: 'typescript' },
+        { name: 'Python', type: 'hard', category: 'Languages', icon: 'python' },
+        { name: 'Vue.js', type: 'hard', category: 'Frameworks', icon: 'vuedotjs' },
+        { name: 'Node.js', type: 'hard', category: 'Frameworks', icon: 'nodedotjs' },
+        { name: 'PostgreSQL', type: 'hard', category: 'Databases', icon: 'postgresql' },
+        { name: 'Docker', type: 'hard', category: 'DevOps', icon: 'docker' },
+        { name: 'OpenAI API', type: 'hard', category: 'AI tools', icon: 'openai' },
+        { name: 'Figma', type: 'hard', category: 'AI tools', icon: 'figma' },
+        { name: 'Communication', type: 'soft', category: 'Interpersonal' },
+        { name: 'Teamwork', type: 'soft', category: 'Interpersonal' },
+        { name: 'Problem solving', type: 'soft', category: 'Interpersonal' },
+        { name: 'Adaptability', type: 'soft', category: 'Personal' },
+        { name: 'Time management', type: 'soft', category: 'Personal' }
       ]
     });
     console.log('Created default skills (hard + soft).');

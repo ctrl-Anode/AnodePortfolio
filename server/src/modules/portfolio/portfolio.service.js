@@ -21,8 +21,8 @@ export const RESOURCES = {
   },
   skill: {
     model: 'skill',
-    sortable: ['createdAt', 'updatedAt', 'sortOrder', 'name'],
-    orderFirst: true,
+    sortable: ['createdAt', 'updatedAt', 'name', 'category'],
+    defaultOrder: [{ category: 'asc' }, { name: 'asc' }],
     searchable: ['name']
   },
   certificate: {
@@ -58,6 +58,9 @@ export function ensureResource(resource) {
 
 function orderBy(meta, query) {
   const parsed = parsePagination(query, { sortable: meta.sortable });
+  if (!query.sort && meta.defaultOrder) {
+    return meta.defaultOrder;
+  }
   if (!query.sort && meta.orderFirst) {
     return [{ sortOrder: 'asc' }, { createdAt: 'desc' }];
   }
