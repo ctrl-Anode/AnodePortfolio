@@ -69,7 +69,13 @@ function orderBy(meta, query) {
 
 export async function listResource(resource, query, { publicOnly = false } = {}) {
   const meta = ensureResource(resource);
-  const { page, limit, offset } = parsePagination(query, { sortable: meta.sortable });
+  // Public (homepage) lists are rendered in full, so default to the API max and
+  // let the client show every row. Admin keeps the smaller page size so its
+  // table pagination still works.
+  const { page, limit, offset } = parsePagination(query, {
+    sortable: meta.sortable,
+    defaultLimit: publicOnly ? 100 : 20
+  });
 
   const where = {};
   if (meta.searchable && query.q) {

@@ -33,7 +33,7 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 - **Section order**: Experience, Projects, About, Skills, Certificates, GitHub, Testimonials, Contact
 - **Divider system** - a single `SectionDivider` component renders matching hairline rules between sections
 - **Icon rail navigation** - desktop rail with hover/focus tooltips, mobile floating rail with a visible arrow tab, scroll-close, and smooth scroll-to-section with URL deep links
-- **Skills showcase** - hard skills (languages, frameworks, AI tools...) grouped by category, each with a branded logo (uploaded image or Simple Icons slug); soft skills render as compact pills
+- **Skills showcase** - skills grouped into compact per-category cards (each with a fitting icon); click a card to open a pop-up listing every skill in that category with its branded logo (uploaded image or Simple Icons slug). Hard and soft skills are shown separately
 - **Pull-cord theme switch** - a hanging ceiling bulb in the header center; click the bulb or pull the string to toggle light/dark; it hides while scrolling
 - **Transparent header** - no blur, no borders; a thin scroll progress bar stays on top
 - **GitHub integration** - optionally sync repositories from the GitHub API into the site

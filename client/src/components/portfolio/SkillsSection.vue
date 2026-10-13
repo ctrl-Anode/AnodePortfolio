@@ -1,12 +1,60 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import {
+  Code2,
+  Layers,
+  Database,
+  Cloud,
+  Sparkles,
+  Monitor,
+  Server,
+  Smartphone,
+  FlaskConical,
+  Palette,
+  ShieldCheck,
+  Wrench,
+  HeartHandshake,
+  UserRound,
+  MessageCircle,
+  Users,
+  Tag,
+  Maximize2
+} from 'lucide-vue-next';
 import { usePortfolioList } from '@/composables/usePortfolioList';
-import { skillLogoUrl } from '@/utils/skillLogo';
 import SectionHeading from '@/components/portfolio/ui/SectionHeading.vue';
-import SkillLogo from '@/components/portfolio/ui/SkillLogo.vue';
 import EmptyState from '@/components/portfolio/ui/EmptyState.vue';
+import SkillCategoryDialog from '@/components/portfolio/ui/SkillCategoryDialog.vue';
 
+// Public lists return the full set (the server defaults public endpoints to the
+// API max), so every skill is shown rather than just the first page.
 const { rows: skills, loading } = usePortfolioList('skills');
+
+// Pick a fitting icon per category by keyword. More specific matches come first;
+// anything unmatched falls back to a tag.
+const CATEGORY_ICONS = [
+  { match: ['language', 'programming'], icon: Code2 },
+  { match: ['ai', 'machine learning', 'artificial intelligence'], icon: Sparkles },
+  { match: ['framework', 'library', 'libraries'], icon: Layers },
+  { match: ['database', 'data', 'sql'], icon: Database },
+  { match: ['devops', 'infra', 'cloud', 'deploy'], icon: Cloud },
+  { match: ['frontend', 'front-end'], icon: Monitor },
+  { match: ['backend', 'back-end', 'api'], icon: Server },
+  { match: ['mobile', 'android', 'ios'], icon: Smartphone },
+  { match: ['test', 'qa'], icon: FlaskConical },
+  { match: ['design', 'ux'], icon: Palette },
+  { match: ['security', 'auth'], icon: ShieldCheck },
+  { match: ['interpersonal', 'people', 'team', 'collaboration'], icon: HeartHandshake },
+  { match: ['communication'], icon: MessageCircle },
+  { match: ['leadership', 'management'], icon: Users },
+  { match: ['personal', 'self'], icon: UserRound },
+  { match: ['tool'], icon: Wrench }
+];
+
+function categoryIcon(name) {
+  const value = String(name || '').toLowerCase();
+  const found = CATEGORY_ICONS.find(({ match }) => match.some((key) => value.includes(key)));
+  return found ? found.icon : Tag;
+}
 
 // Skills created before the `type` column existed fall back to "hard".
 const normalized = computed(() =>
@@ -14,7 +62,7 @@ const normalized = computed(() =>
 );
 
 // Group by category with both the categories and their skills sorted A-Z, so
-// the public list is stable and alphabetical regardless of API row order.
+// the cards are stable and alphabetical regardless of API row order.
 function groupByCategory(items) {
   const map = new Map();
   for (const skill of items) {
@@ -25,80 +73,104 @@ function groupByCategory(items) {
   const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
   return Array.from(map.entries())
     .sort(([a], [b]) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
-    .map(([category, list]) => [category, [...list].sort(byName)]);
+    .map(([category, list]) => ({
+      category,
+      items: [...list].sort(byName),
+      icon: categoryIcon(category)
+    }));
 }
 
-const hardGroups = computed(() => groupByCategory(normalized.value.filter((s) => s.type === 'hard')));
-const softGroups = computed(() => groupByCategory(normalized.value.filter((s) => s.type === 'soft')));
+const hardCards = computed(() =>
+  groupByCategory(normalized.value.filter((s) => s.type === 'hard')).map((group) => ({ ...group, type: 'hard' }))
+);
+const softCards = computed(() =>
+  groupByCategory(normalized.value.filter((s) => s.type === 'soft')).map((group) => ({ ...group, type: 'soft' }))
+);
 
-// Chips only show a logo when the skill actually defines one, so text-only
-// soft skills stay compact.
-function hasLogo(skill) {
-  return Boolean(skillLogoUrl(skill));
+const active = ref(null);
+
+function openCategory(card) {
+  active.value = card;
 }
 </script>
 
 <template>
   <section id="skills" class="scroll-mt-24 bg-neutral-50/60 dark:bg-neutral-900/30">
     <div class="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
-      <SectionHeading eyebrow="Skills" title="My toolkit" subtitle="The languages, frameworks and tools I reach for every day - plus how I like to work with people." />
+      <SectionHeading eyebrow="Skills" title="My toolkit" subtitle="The languages, frameworks and tools I reach for every day - plus how I like to work with people. Tap a category to see the skills inside." />
 
-      <div v-if="loading" class="mt-12 space-y-8">
-        <div v-for="i in 2" :key="i" class="space-y-3">
-          <p class="skeleton h-4 w-24" />
-          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            <p v-for="j in 8" :key="j" class="skeleton h-10 w-full" />
-          </div>
-        </div>
+      <div v-if="loading" class="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div v-for="i in 6" :key="i" class="h-16 animate-pulse rounded-xl bg-neutral-200/70 dark:bg-neutral-800/70" />
       </div>
 
       <template v-else-if="normalized.length">
-        <!-- Hard skills: languages, frameworks, AI tools, ... each with a logo -->
-        <div v-if="hardGroups.length" class="mt-12 space-y-8">
+        <!-- Hard skills: one compact card per category, click to open -->
+        <div v-if="hardCards.length" class="mt-12">
           <div v-reveal class="flex items-center gap-4">
             <h3 class="font-display text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Hard skills</h3>
             <span class="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" aria-hidden="true" />
           </div>
 
-          <div v-for="[category, items] in hardGroups" :key="category" v-reveal class="space-y-3">
-            <h4 class="mono-label text-accent-600 dark:text-accent-300">{{ category }}</h4>
-            <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-              <li
-                v-for="skill in items"
-                :key="skill.id"
-                class="flex min-w-0 items-center gap-2.5 rounded-lg border border-neutral-200/70 bg-white px-3 py-2 shadow-sm transition-colors hover:border-accent-500/40 dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <SkillLogo :skill="skill" />
-                <span class="min-w-0 break-words text-sm font-medium leading-tight text-neutral-800 dark:text-neutral-100">{{ skill.name }}</span>
-              </li>
-            </ul>
+          <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <button
+              v-for="card in hardCards"
+              :key="card.category"
+              v-reveal
+              type="button"
+              class="group flex items-center gap-3 rounded-xl border border-neutral-200/70 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-accent-500/40 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/50 dark:border-neutral-800 dark:bg-neutral-900"
+              @click="openCategory(card)"
+            >
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-600 dark:bg-accent-500/15 dark:text-accent-300">
+                <component :is="card.icon" class="h-5 w-5" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-neutral-800 dark:text-neutral-100" :title="card.category">{{ card.category }}</span>
+                <span class="block text-xs text-neutral-500 dark:text-neutral-400">{{ card.items.length }} {{ card.items.length === 1 ? 'skill' : 'skills' }}</span>
+              </span>
+              <Maximize2 class="h-4 w-4 shrink-0 text-neutral-400 transition group-hover:text-accent-500" aria-hidden="true" />
+            </button>
           </div>
         </div>
 
-        <!-- Soft skills: interpersonal strengths rendered as compact pills -->
-        <div v-if="softGroups.length" class="mt-12 space-y-8">
+        <!-- Soft skills: same card pattern, listed separately -->
+        <div v-if="softCards.length" class="mt-12">
           <div v-reveal class="flex items-center gap-4">
             <h3 class="font-display text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Soft skills</h3>
             <span class="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" aria-hidden="true" />
           </div>
 
-          <div v-for="[category, items] in softGroups" :key="category" v-reveal class="space-y-3">
-            <h4 class="mono-label text-neutral-400 dark:text-neutral-500">{{ category }}</h4>
-            <ul class="flex flex-wrap gap-2">
-              <li
-                v-for="skill in items"
-                :key="skill.id"
-                class="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-accent-500/40 hover:text-accent-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:text-accent-300"
-              >
-                <SkillLogo v-if="hasLogo(skill)" :skill="skill" size="sm" />
-                {{ skill.name }}
-              </li>
-            </ul>
+          <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <button
+              v-for="card in softCards"
+              :key="card.category"
+              v-reveal
+              type="button"
+              class="group flex items-center gap-3 rounded-xl border border-neutral-200/70 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-accent-500/40 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/50 dark:border-neutral-800 dark:bg-neutral-900"
+              @click="openCategory(card)"
+            >
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-600 dark:bg-accent-500/15 dark:text-accent-300">
+                <component :is="card.icon" class="h-5 w-5" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-neutral-800 dark:text-neutral-100" :title="card.category">{{ card.category }}</span>
+                <span class="block text-xs text-neutral-500 dark:text-neutral-400">{{ card.items.length }} {{ card.items.length === 1 ? 'skill' : 'skills' }}</span>
+              </span>
+              <Maximize2 class="h-4 w-4 shrink-0 text-neutral-400 transition group-hover:text-accent-500" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </template>
 
-      <EmptyState v-else class="mt-12" title="No skills yet" hint="Add your toolkit in the admin panel and grouped lists will appear here." />
+      <EmptyState v-else class="mt-12" title="No skills yet" hint="Add your toolkit in the admin panel and category cards will appear here." />
+
+      <SkillCategoryDialog
+        :open="!!active"
+        :category="active?.category || ''"
+        :icon="active?.icon || null"
+        :skills="active?.items || []"
+        :type="active?.type || 'hard'"
+        @close="active = null"
+      />
     </div>
   </section>
 </template>
