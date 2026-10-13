@@ -264,7 +264,6 @@ model Skill {
   /// "hard" (technical, gets a logo) or "soft" (interpersonal, rendered as chips)
   type      String   @default("hard") @db.VarChar(20)
   category  String   @default("Other") @db.VarChar(50)
-  level     Int?
   /// Simple Icons slug for automatic branding (e.g. "python", "openai", "docker")
   icon      String?  @db.VarChar(80)
   /// Custom or uploaded logo image; takes precedence over `icon`

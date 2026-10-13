@@ -33,7 +33,7 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 - **Section order**: Experience, Projects, About, Skills, Certificates, GitHub, Testimonials, Contact
 - **Divider system** - a single `SectionDivider` component renders matching hairline rules between sections
 - **Icon rail navigation** - desktop rail with hover/focus tooltips, mobile floating rail with a visible arrow tab, scroll-close, and smooth scroll-to-section with URL deep links
-- **Skills showcase** - hard skills (languages, frameworks, AI tools...) grouped by category, each with a branded logo (uploaded image or Simple Icons slug) and optional proficiency bar; soft skills render as chips
+- **Skills showcase** - hard skills (languages, frameworks, AI tools...) grouped by category, each with a branded logo (uploaded image or Simple Icons slug); soft skills render as compact pills
 - **Pull-cord theme switch** - a hanging ceiling bulb in the header center; click the bulb or pull the string to toggle light/dark; it hides while scrolling
 - **Transparent header** - no blur, no borders; a thin scroll progress bar stays on top
 - **GitHub integration** - optionally sync repositories from the GitHub API into the site
@@ -223,7 +223,7 @@ MySQL 8 via Prisma. Migrations live in `server/prisma/migrations`.
 | `Hero` | Landing content | `heroBio`, `primaryButtonText/Url`, `secondaryButtonText/Url`, `published`, `sortOrder` |
 | `Experience` | Work history | `role`, `company`, `location`, `startDate`, `endDate`, `current`, `description`, `sortOrder` |
 | `Project` | Portfolio projects | `title`, `slug`, `description`, `techStack`, `repoUrl`, `demoUrl`, `imageUrl`, `featured`, `published` |
-| `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `level`, `icon`, `logoUrl`, `keywords`, `sortOrder` |
+| `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `icon`, `logoUrl`, `keywords`, `sortOrder` |
 | `Certificate` | Credentials | `title`, `issuer`, `issuedAt`, `credentialUrl`, `imageUrl` |
 | `GithubRepo` | Synced repositories | `name`, `url`, `language`, `stars`, `topics` |
 | `Testimonial` | Quotes | `author`, `role`, `quote`, `avatarUrl` |
@@ -421,6 +421,32 @@ Requirements & notes for Render:
   off once your content is in place.
 - Client env is baked at build time - leave `VITE_API_BASE_URL` empty (same-origin `/api/v1`).
 
+### 12.2 Render free-tier cold starts
+
+A free Render web service **spins down after ~15 minutes without traffic**. The next
+visit has to boot the container again (~30-60s), and during that window Render serves
+its own **"Application loading"** page from the edge proxy - *before* the container can
+respond. This is Render behaviour, not an application bug: `/healthz` returns 200 and
+the app boots normally once the instance is up.
+
+Options:
+
+| Option | Effect | Notes |
+| --- | --- | --- |
+| Upgrade the instance type (Starter+) | Never spins down | The proper fix for production |
+| Keep it warm with an external uptime monitor | Prevents spin-down | Free UptimeRobot / cron-job.org HTTP monitor hitting `/healthz` every 5 minutes - see steps below |
+| Accept the cold start | Nothing to do | Fine for a personal site; only the first visit is slow |
+
+**Keep-alive with an external monitor (free):**
+
+1. Create an account at [UptimeRobot](https://uptimerobot.com) (or [cron-job.org](https://cron-job.org)).
+2. Add an **HTTP(S)** monitor with URL `https://<your-service>.onrender.com/healthz`.
+3. Set the check interval to **5 minutes** and save.
+
+`/healthz` is a static `200` that does **not** query the database, so pings are
+effectively free. One always-awake free service uses ~720 instance-hours/month, within
+Render's 750 free hours.
+
 ---
 
 ## 13. Troubleshooting
@@ -432,6 +458,7 @@ Requirements & notes for Render:
 | `prisma migrate dev` refuses to run non-interactively | Create the migration file manually with `prisma migrate diff` + `migrate deploy`, or run it from an interactive terminal |
 | 422 on hero save | Button target must be a URL, path, `#anchor`, or plain section key - the admin dropdown already enforces valid keys |
 | Client can't reach the API | Check `VITE_API_BASE_URL` / `VITE_PROXY_TARGET`; the default proxy targets `http://localhost:5000` |
+| Render URL shows "Application loading" for 30-60s then works | Free instance spun down after 15 min idle (cold start). Keep it warm with an external `/healthz` monitor or upgrade the instance type - see [12.2](#122-render-free-tier-cold-starts) |
 
 Further setup details: **[SETUP.md](SETUP.md)**.
 

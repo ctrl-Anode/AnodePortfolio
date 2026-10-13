@@ -121,7 +121,6 @@ export const createSchemas = {
     name: z.string().trim().min(1).max(100),
     type: skillType,
     category: optString(50),
-    level: z.coerce.number().int().min(0).max(100).nullish(),
     icon: optString(80),
     logoUrl: optString(5000),
     keywords: jsonField,

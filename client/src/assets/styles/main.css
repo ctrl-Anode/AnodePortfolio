@@ -175,15 +175,6 @@
     transition-delay: 300ms;
   }
 
-  /* Skill bars grow once their card scrolls into view (v-reveal) */
-  .skill-fill {
-    width: 0;
-    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
-  }
-  .is-revealed .skill-fill {
-    width: var(--level);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .reveal,
     .reveal.up,
