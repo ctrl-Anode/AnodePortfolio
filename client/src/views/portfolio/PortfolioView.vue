@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
     <SiteHeader :links="links" :active-section="activeSection" :name="name" :initials="initials" />
     <SiteSidebar :links="links" :active-section="activeSection" />
 
-    <main class="xl:pl-28">
+    <main>
       <HeroSection />
       <SectionDivider />
       <ExperienceSection />

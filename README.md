@@ -32,7 +32,7 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 - **Profile and Hero are separate resources** - the About section owns name, headline, bio, status, location, degree, and links; the Hero owns only what is specific to the landing view
 - **Section order**: Experience, Projects, About, Skills, Certificates, GitHub, Testimonials, Contact
 - **Divider system** - a single `SectionDivider` component renders matching hairline rules between sections
-- **Icon rail navigation** - desktop rail with hover/focus tooltips, mobile floating rail with a visible arrow tab, scroll-close, and smooth scroll-to-section with URL deep links
+- **Icon rail navigation** - one floating rail at every size with hover/focus tooltips, opened by the visible accent arrow tab, scroll-close, and smooth scroll-to-section with URL deep links
 - **Skills showcase** - skills grouped into compact per-category cards (each with a fitting icon); click a card to open a pop-up listing every skill in that category with its branded logo (uploaded image or Simple Icons slug). Hard and soft skills are shown separately
 - **Pull-cord theme switch** - a hanging ceiling bulb in the header center; click the bulb or pull the string to toggle light/dark; it hides while scrolling
 - **Transparent header** - no blur, no borders; a thin scroll progress bar stays on top
@@ -319,8 +319,8 @@ Hero button URLs accept absolute URLs, `/paths`, `#anchors`, `mailto:`/`tel:`, o
 | Breakpoint | Navigation |
 | --- | --- |
 | `< lg` | Floating icon rail, toggled by the accent arrow tab; closes on scroll or selection (250 ms before scrolling) |
-| `lg` - `xl` | Horizontal header nav |
-| `xl +` | Permanent icon rail with tooltip labels |
+| `lg` - `xl` | Horizontal header nav, plus the floating icon rail on demand |
+| `xl +` | Floating icon rail, toggled by the accent arrow tab (same as mobile); hover/focus tooltips on icons |
 
 ### Theme
 
