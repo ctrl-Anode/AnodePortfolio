@@ -100,17 +100,22 @@ export const RESOURCES = [
     resource: 'skill',
     label: 'Skill',
     labelPlural: 'Skills',
-    description: 'Skills grouped by category with proficiency',
+    description: 'Hard skills (with logos) and soft skills, grouped by category',
     columns: [
+      { accessorKey: 'logoUrl', header: 'Logo', render: 'image' },
       { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'type', header: 'Type', render: 'badge', badgeTone: { hard: 'green', soft: 'amber' } },
       { accessorKey: 'category', header: 'Category', render: 'badge' },
       { accessorKey: 'level', header: 'Level' },
       { accessorKey: 'sortOrder', header: 'Order' }
     ],
     fields: [
       { name: 'name', label: 'Name', type: 'text', required: true },
-      { name: 'category', label: 'Category', type: 'text', hint: 'Defaults to "Other"' },
-      { name: 'level', label: 'Proficiency (0–100)', type: 'number' },
+      { name: 'type', label: 'Type', type: 'select', options: ['hard', 'soft'], hint: 'Hard skills show a logo and level; soft skills render as chips' },
+      { name: 'category', label: 'Category', type: 'text', hint: 'e.g. Languages, AI tools, Frameworks. Defaults to "Other"' },
+      { name: 'level', label: 'Proficiency (0–100)', type: 'number', hint: 'Optional - mostly used for hard skills' },
+      { name: 'icon', label: 'Logo icon', type: 'text', hint: 'Simple Icons slug, e.g. python, openai, docker (logo at cdn.simpleicons.org)' },
+      { name: 'logoUrl', label: 'Custom logo', type: 'upload', uploadKind: 'image', hint: 'Optional image - overrides the icon slug above' },
       { name: 'keywords', label: 'Keywords', type: 'list', hint: 'One keyword per line' },
       { name: 'sortOrder', label: 'Sort order', type: 'number', hint: 'Lower shows first' }
     ]

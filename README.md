@@ -33,6 +33,7 @@ The public site is a fast, accessible Vue 3 single-page portfolio; the admin pan
 - **Section order**: Experience, Projects, About, Skills, Certificates, GitHub, Testimonials, Contact
 - **Divider system** - a single `SectionDivider` component renders matching hairline rules between sections
 - **Icon rail navigation** - desktop rail with hover/focus tooltips, mobile floating rail with a visible arrow tab, scroll-close, and smooth scroll-to-section with URL deep links
+- **Skills showcase** - hard skills (languages, frameworks, AI tools...) grouped by category, each with a branded logo (uploaded image or Simple Icons slug) and optional proficiency bar; soft skills render as chips
 - **Pull-cord theme switch** - a hanging ceiling bulb in the header center; click the bulb or pull the string to toggle light/dark; it hides while scrolling
 - **Transparent header** - no blur, no borders; a thin scroll progress bar stays on top
 - **GitHub integration** - optionally sync repositories from the GitHub API into the site
@@ -222,7 +223,7 @@ MySQL 8 via Prisma. Migrations live in `server/prisma/migrations`.
 | `Hero` | Landing content | `heroBio`, `primaryButtonText/Url`, `secondaryButtonText/Url`, `published`, `sortOrder` |
 | `Experience` | Work history | `role`, `company`, `location`, `startDate`, `endDate`, `current`, `description`, `sortOrder` |
 | `Project` | Portfolio projects | `title`, `slug`, `description`, `techStack`, `repoUrl`, `demoUrl`, `imageUrl`, `featured`, `published` |
-| `Skill` | Grouped skills | `name`, `category`, `level`, `keywords` |
+| `Skill` | Hard & soft skills | `name`, `type` (hard/soft), `category`, `level`, `icon`, `logoUrl`, `keywords`, `sortOrder` |
 | `Certificate` | Credentials | `title`, `issuer`, `issuedAt`, `credentialUrl`, `imageUrl` |
 | `GithubRepo` | Synced repositories | `name`, `url`, `language`, `stars`, `topics` |
 | `Testimonial` | Quotes | `author`, `role`, `quote`, `avatarUrl` |

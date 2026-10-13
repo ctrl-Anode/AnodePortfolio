@@ -42,6 +42,16 @@ export const RESOURCE_NAMES = [
 
 export const CONTACT_STATUSES = ['NEW', 'REPLIED', 'ARCHIVED'];
 
+export const SKILL_TYPES = ['hard', 'soft'];
+
+// Accepts an empty select value (new rows) and drops it so the service can
+// apply its default instead of failing enum validation.
+const skillType = z
+  .enum(SKILL_TYPES)
+  .or(z.literal(''))
+  .transform((value) => (value === '' ? undefined : value))
+  .optional();
+
 export const resourceParamSchema = z.object({
   resource: z.enum(RESOURCE_NAMES)
 });
@@ -59,6 +69,7 @@ export const listQuerySchema = z.object({
   featured: z.enum(['true', 'false']).optional(),
   published: z.enum(['true', 'false']).optional(),
   category: z.string().trim().max(50).optional(),
+  type: skillType,
   status: z.enum(CONTACT_STATUSES).optional()
 });
 
@@ -108,8 +119,11 @@ export const createSchemas = {
   }),
   skill: z.object({
     name: z.string().trim().min(1).max(100),
+    type: skillType,
     category: optString(50),
     level: z.coerce.number().int().min(0).max(100).nullish(),
+    icon: optString(80),
+    logoUrl: optString(5000),
     keywords: jsonField,
     sortOrder: intField
   }),

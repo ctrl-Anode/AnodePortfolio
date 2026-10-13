@@ -77,7 +77,10 @@ export async function listResource(resource, query, { publicOnly = false } = {})
     else if (query.published) where.published = query.published === 'true';
     if (query.featured) where.featured = query.featured === 'true';
   }
-  if (resource === 'skill' && query.category) where.category = query.category;
+  if (resource === 'skill') {
+    if (query.category) where.category = query.category;
+    if (query.type) where.type = query.type;
+  }
   if (resource === 'contact' && query.status) where.status = query.status;
 
   const delegate = prisma[meta.model];
@@ -108,7 +111,10 @@ export function listProfile() {
 export async function createResource(resource, data) {
   const meta = ensureResource(resource);
   const payload = { ...data };
-  if (resource === 'skill' && payload.category == null) payload.category = 'Other';
+  if (resource === 'skill') {
+    if (payload.category == null) payload.category = 'Other';
+    if (payload.type == null) payload.type = 'hard';
+  }
   return prisma[meta.model].create({ data: payload });
 }
 

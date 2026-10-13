@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `skills` ADD COLUMN `type` VARCHAR(20) NOT NULL DEFAULT 'hard';
+ALTER TABLE `skills` ADD COLUMN `icon` VARCHAR(80) NULL;
+ALTER TABLE `skills` ADD COLUMN `logoUrl` TEXT NULL;

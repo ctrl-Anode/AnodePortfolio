@@ -167,6 +167,29 @@ async function seedPortfolio() {
     });
     console.log('Created default hero.');
   }
+
+  const skillCount = await prisma.skill.count();
+  if (skillCount === 0) {
+    await prisma.skill.createMany({
+      data: [
+        { name: 'JavaScript', type: 'hard', category: 'Languages', icon: 'javascript', level: 92, sortOrder: 0 },
+        { name: 'TypeScript', type: 'hard', category: 'Languages', icon: 'typescript', level: 88, sortOrder: 1 },
+        { name: 'Python', type: 'hard', category: 'Languages', icon: 'python', level: 80, sortOrder: 2 },
+        { name: 'Vue.js', type: 'hard', category: 'Frameworks', icon: 'vuedotjs', level: 90, sortOrder: 3 },
+        { name: 'Node.js', type: 'hard', category: 'Frameworks', icon: 'nodedotjs', level: 85, sortOrder: 4 },
+        { name: 'PostgreSQL', type: 'hard', category: 'Databases', icon: 'postgresql', level: 78, sortOrder: 5 },
+        { name: 'Docker', type: 'hard', category: 'DevOps', icon: 'docker', level: 75, sortOrder: 6 },
+        { name: 'OpenAI API', type: 'hard', category: 'AI tools', icon: 'openai', level: 82, sortOrder: 7 },
+        { name: 'Figma', type: 'hard', category: 'AI tools', icon: 'figma', level: 70, sortOrder: 8 },
+        { name: 'Communication', type: 'soft', category: 'Interpersonal', sortOrder: 9 },
+        { name: 'Teamwork', type: 'soft', category: 'Interpersonal', sortOrder: 10 },
+        { name: 'Problem solving', type: 'soft', category: 'Interpersonal', sortOrder: 11 },
+        { name: 'Adaptability', type: 'soft', category: 'Personal', sortOrder: 12 },
+        { name: 'Time management', type: 'soft', category: 'Personal', sortOrder: 13 }
+      ]
+    });
+    console.log('Created default skills (hard + soft).');
+  }
 }
 
 async function main() {

@@ -10,6 +10,7 @@ import DataTable from '@/components/common/DataTable.vue';
 import ResourceModal from '@/components/admin/ResourceModal.vue';
 import { useToastStore } from '@/stores/toast';
 import { formatMonthYear } from '@/utils/format';
+import { skillLogoUrl } from '@/utils/skillLogo';
 
 const route = useRoute();
 const toast = useToastStore();
@@ -54,6 +55,18 @@ const columns = computed(() => {
       def.cell = (info) => badge(info.getValue() ? 'Yes' : 'No', badgeToneFor(column, info.getValue()));
     } else if (column.render === 'badge') {
       def.cell = (info) => badge(info.getValue() ?? '—', badgeToneFor(column, info.getValue()));
+    } else if (column.render === 'image') {
+      def.cell = (info) => {
+        const row = info.row.original || {};
+        const src = 'icon' in row || 'logoUrl' in row ? skillLogoUrl(row) : info.getValue();
+        if (!src) return h('span', { class: 'text-gray-400 dark:text-gray-500' }, '—');
+        return h('img', {
+          src,
+          alt: '',
+          loading: 'lazy',
+          class: 'h-8 w-8 rounded-lg object-contain ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700'
+        });
+      };
     } else {
       def.cell = (info) => {
         const text = info.getValue() == null ? '' : String(info.getValue());
